@@ -11,18 +11,20 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession()
     const router = useRouter()
 
-    useEffect(() => {
-        if (session) {
-            router.push("/")
-        } else {
-            router.push("/login")
-        }
-    }, [pathname])
+    console.log("user", session?.user)
+
+    // useEffect(() => {
+    //     if (session?.user) {
+    //         router.push("/")
+    //     } else {
+    //         router.push("/login")
+    //     }
+    // }, [pathname])
 
     return (
         <>
             {
-                pathname === "/login" ? (
+                pathname === "/login" || pathname === "/signup" ? (
                     <>
                         {children}
                     </>
