@@ -7,6 +7,10 @@ export interface ISignUpForm {
     password: string;
 }
 
+export interface ErrorResponse {
+    message: string;
+}
+
 export const UserSchema: ZodType<ISignUpForm> = z.object({
     email: z.string({
         required_error: "email is required",
@@ -30,3 +34,9 @@ export const UserSchema: ZodType<ISignUpForm> = z.object({
         .min(8, { message: "Password is too short" })
         .max(20, { message: "Password is too long" }),
 });
+
+
+export interface IloginForm {
+    email: string;
+    password: string;
+}

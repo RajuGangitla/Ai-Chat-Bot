@@ -1,11 +1,46 @@
-import Image from "next/image"
-import Link from "next/link"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { ErrorResponse, IloginForm } from "@/types/signup";
+import axios, { AxiosError } from "axios";
+import { toast } from "../ui/use-toast";
+import { useRouter } from "next/navigation";
+import { FormEvent } from "react";
+import ReusableFormRow from "../ui/reusable-formrow";
+import ReusableInput from "../ui/reusable-input";
 
 export default function Login() {
+
+    const router = useRouter()
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = useForm<IloginForm>();
+
+
+    const onSubmit = handleSubmit(async (data: IloginForm) => {
+        const newData: any = { ...data }
+        await axios.get("/api/auth", newData).then((res) => {
+            toast({
+                title: "Login Successfully"
+            })
+            router.push("/")
+        }).catch((err: AxiosError) => {
+            if (axios.isAxiosError(err) && err.response?.data) {
+                const errorResponse = err.response.data as ErrorResponse; // Type assertion
+                toast({
+                    title: errorResponse.message,
+                });
+                console.log(errorResponse.message, "error");
+            }
+        })
+    })
+
     return (
         <div className="w-full min-h-screen lg:grid lg:grid-cols-2 ">
             <div className="flex items-center justify-center py-12">
@@ -17,26 +52,41 @@ export default function Login() {
                         </p>
                     </div>
                     <div className="grid gap-4">
+
+                        <form onSubmit={(e: FormEvent) => {
+                            e.preventDefault()
+                            onSubmit(e)
+                        }}></form>
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="m@example.com"
-                                required
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <div className="flex items-center">
-                                <Label htmlFor="password">Password</Label>
-                                {/* <Link
-                                    href="/forgot-password"
-                                    className="ml-auto inline-block text-sm underline"
-                                >
-                                    Forgot your password?
-                                </Link> */}
-                            </div>
-                            <Input id="password" type="password" required />
+                            <ReusableFormRow
+                                label={"Email"}
+                                required={true}
+                                errors={errors.email}
+                                name={"email"}
+                            >
+                                <ReusableInput<IloginForm>
+                                    control={control}
+                                    name={"email"}
+                                    required={true}
+                                    placeholder={"Enter mail"}
+                                    type={"email"}
+                                />
+
+                            </ReusableFormRow>
+                            <ReusableFormRow
+                                label={"Password"}
+                                required={true}
+                                errors={errors.password}
+                                name={"password"}
+                            >
+                                <ReusableInput<IloginForm>
+                                    control={control}
+                                    name={"password"}
+                                    required={true}
+                                    placeholder={"Enter password"}
+                                    type={"password"}
+                                />
+                            </ReusableFormRow>
                         </div>
                         <Button type="submit" className="w-full">
                             Login
@@ -60,5 +110,5 @@ export default function Login() {
                 />
             </div>
         </div>
-    )
+    );
 }

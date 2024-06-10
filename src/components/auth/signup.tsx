@@ -15,11 +15,14 @@ import {
 import { useForm } from "react-hook-form";
 import ReusableFormRow from "../ui/reusable-formrow";
 import ReusableInput from "../ui/reusable-input";
-import { ISignUpForm, UserSchema } from "@/types/signup";
+import { ErrorResponse, ISignUpForm, UserSchema } from "@/types/signup";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios"
+import axios, { AxiosError, AxiosResponse } from "axios"
+import { toast } from "../ui/use-toast";
 
 export default function SignUp() {
+
+    const router = useRouter()
     const {
         handleSubmit,
         control,
@@ -31,12 +34,20 @@ export default function SignUp() {
 
     const onSubmit = handleSubmit(async (data: ISignUpForm) => {
         const newData: any = { ...data }
-        await axios.post("/api/user", newData).then((res) => {
-            console.log(res, "res")
-        }).catch((err) => {
-            console.log(err.message, "errr")
+        await axios.post("/api/register", newData).then((res) => {
+            toast({
+                title: "User created Successfully"
+            })
+            router.push("/login")
+        }).catch((err: AxiosError) => {
+            if (axios.isAxiosError(err) && err.response?.data) {
+                const errorResponse = err.response.data as ErrorResponse; // Type assertion
+                toast({
+                    title: errorResponse.message,
+                });
+                console.log(errorResponse.message, "error");
+            }
         })
-        console.log(newData)
     });
 
     return (
@@ -56,72 +67,64 @@ export default function SignUp() {
                         }}>
                             <div className="grid gap-4">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="grid gap-2">
-                                        <ReusableFormRow
-                                            label={"First name"}
-                                            required={true}
-                                            errors={errors.firstName}
+                                    <ReusableFormRow
+                                        label={"First name"}
+                                        required={true}
+                                        errors={errors.firstName}
+                                        name={"firstName"}
+                                    >
+                                        <ReusableInput<ISignUpForm>
+                                            control={control}
                                             name={"firstName"}
-                                        >
-                                            <ReusableInput<ISignUpForm>
-                                                control={control}
-                                                name={"firstName"}
-                                                required={true}
-                                                placeholder={"Enter first name "}
-                                                type={"text"}
-                                            />
-                                        </ReusableFormRow>
-                                    </div>
-                                    <div className="grid gap-2">
-                                        <ReusableFormRow
-                                            label={"Last name"}
                                             required={true}
-                                            errors={errors.lastName}
+                                            placeholder={"Enter first name "}
+                                            type={"text"}
+                                        />
+                                    </ReusableFormRow>
+                                    <ReusableFormRow
+                                        label={"Last name"}
+                                        required={true}
+                                        errors={errors.lastName}
+                                        name={"lastName"}
+                                    >
+                                        <ReusableInput<ISignUpForm>
+                                            control={control}
                                             name={"lastName"}
-                                        >
-                                            <ReusableInput<ISignUpForm>
-                                                control={control}
-                                                name={"lastName"}
-                                                required={true}
-                                                placeholder={"Enter last name "}
-                                                type={"text"}
-                                            />
-                                        </ReusableFormRow>
-                                    </div>
+                                            required={true}
+                                            placeholder={"Enter last name "}
+                                            type={"text"}
+                                        />
+                                    </ReusableFormRow>
                                 </div>
-                                <div className="grid gap-2">
-                                    <ReusableFormRow
-                                        label={"Email"}
-                                        required={true}
-                                        errors={errors.email}
+                                <ReusableFormRow
+                                    label={"Email"}
+                                    required={true}
+                                    errors={errors.email}
+                                    name={"email"}
+                                >
+                                    <ReusableInput<ISignUpForm>
+                                        control={control}
                                         name={"email"}
-                                    >
-                                        <ReusableInput<ISignUpForm>
-                                            control={control}
-                                            name={"email"}
-                                            required={true}
-                                            placeholder={"Enter mail"}
-                                            type={"email"}
-                                        />
-
-                                    </ReusableFormRow>
-                                </div>
-                                <div className="grid gap-2">
-                                    <ReusableFormRow
-                                        label={"Password"}
                                         required={true}
-                                        errors={errors.password}
+                                        placeholder={"Enter mail"}
+                                        type={"email"}
+                                    />
+
+                                </ReusableFormRow>
+                                <ReusableFormRow
+                                    label={"Password"}
+                                    required={true}
+                                    errors={errors.password}
+                                    name={"password"}
+                                >
+                                    <ReusableInput<ISignUpForm>
+                                        control={control}
                                         name={"password"}
-                                    >
-                                        <ReusableInput<ISignUpForm>
-                                            control={control}
-                                            name={"password"}
-                                            required={true}
-                                            placeholder={"Enter password"}
-                                            type={"password"}
-                                        />
-                                    </ReusableFormRow>
-                                </div>
+                                        required={true}
+                                        placeholder={"Enter password"}
+                                        type={"password"}
+                                    />
+                                </ReusableFormRow>
                                 <Button type="submit" className="w-full">
                                     Create an account
                                 </Button>
