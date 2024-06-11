@@ -11,8 +11,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession()
     const router = useRouter()
 
-    console.log("user", session?.user)
-
     // useEffect(() => {
     //     if (session?.user) {
     //         router.push("/")

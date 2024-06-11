@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 import ReusableFormRow from "../ui/reusable-formrow";
 import ReusableInput from "../ui/reusable-input";
+import api from "@/lib/api";
 
 export default function Login() {
 
@@ -25,7 +26,8 @@ export default function Login() {
 
     const onSubmit = handleSubmit(async (data: IloginForm) => {
         const newData: any = { ...data }
-        await axios.get("/api/auth", newData).then((res) => {
+        console.log(newData, "newData")
+        await api.post("/login", newData).then((res) => {
             toast({
                 title: "Login Successfully"
             })
@@ -56,41 +58,43 @@ export default function Login() {
                         <form onSubmit={(e: FormEvent) => {
                             e.preventDefault()
                             onSubmit(e)
-                        }}></form>
-                        <div className="grid gap-2">
-                            <ReusableFormRow
-                                label={"Email"}
-                                required={true}
-                                errors={errors.email}
-                                name={"email"}
-                            >
-                                <ReusableInput<IloginForm>
-                                    control={control}
+                        }}>
+                            <div className="grid gap-2">
+                                <ReusableFormRow
+                                    label={"Email"}
+                                    required={true}
+                                    errors={errors.email}
                                     name={"email"}
-                                    required={true}
-                                    placeholder={"Enter mail"}
-                                    type={"email"}
-                                />
+                                >
+                                    <ReusableInput<IloginForm>
+                                        control={control}
+                                        name={"email"}
+                                        required={true}
+                                        placeholder={"Enter mail"}
+                                        type={"email"}
+                                    />
 
-                            </ReusableFormRow>
-                            <ReusableFormRow
-                                label={"Password"}
-                                required={true}
-                                errors={errors.password}
-                                name={"password"}
-                            >
-                                <ReusableInput<IloginForm>
-                                    control={control}
-                                    name={"password"}
+                                </ReusableFormRow>
+                                <ReusableFormRow
+                                    label={"Password"}
                                     required={true}
-                                    placeholder={"Enter password"}
-                                    type={"password"}
-                                />
-                            </ReusableFormRow>
-                        </div>
-                        <Button type="submit" className="w-full">
-                            Login
-                        </Button>
+                                    errors={errors.password}
+                                    name={"password"}
+                                >
+                                    <ReusableInput<IloginForm>
+                                        control={control}
+                                        name={"password"}
+                                        required={true}
+                                        placeholder={"Enter password"}
+                                        type={"password"}
+                                    />
+                                </ReusableFormRow>
+                            </div>
+                            <Button type="submit" className="w-full">
+                                Login
+                            </Button>
+                        </form>
+
                     </div>
                     <div className="mt-4 text-center text-sm">
                         Don&apos;t have an account?{" "}

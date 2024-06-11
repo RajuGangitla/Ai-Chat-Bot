@@ -7,21 +7,12 @@ export async function POST(req: Request) {
         const body = await req.json();
         await connectDb();
 
-        if (!body.email || !body.password) {
-            return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
-        }
+        const user = await Users.findOne({ email: body.email }).select('_id email firstName lastName')
 
-        const user = await Users.create(body);
-
-        return NextResponse.json({ message: "User created successfully", user }, { status: 201 });
+        return NextResponse.json({ message: "User created successfully", user }, { status: 200 });
     } catch (error: any) {
-        console.error("Error in creating user:", error);
-        return NextResponse.json({ error: "Error in creating user", message: error.message }, { status: 500 });
+        return NextResponse.json({ error: "Error in fetching user", message: error.message }, { status: 401 });
     }
 }
 
-
-export const GET = async () => {
-
-}
 

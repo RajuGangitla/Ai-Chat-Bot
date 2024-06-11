@@ -19,6 +19,7 @@ import { ErrorResponse, ISignUpForm, UserSchema } from "@/types/signup";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError, AxiosResponse } from "axios"
 import { toast } from "../ui/use-toast";
+import api from "@/lib/api";
 
 export default function SignUp() {
 
@@ -34,7 +35,7 @@ export default function SignUp() {
 
     const onSubmit = handleSubmit(async (data: ISignUpForm) => {
         const newData: any = { ...data }
-        await axios.post("/api/register", newData).then((res) => {
+        await api.post("/register", newData).then((res) => {
             toast({
                 title: "User created Successfully"
             })
