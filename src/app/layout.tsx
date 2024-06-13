@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import NavBar from "@/components/layoutparts/navbar";
 import Layout from "@/components/layoutparts";
-import SessionWrapper from "@/components/layoutparts/session-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,9 +25,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SessionWrapper>
-            <Layout children={children} />
-          </SessionWrapper>
+          <Layout children={children} />
         </ThemeProvider>
       </body>
     </html>

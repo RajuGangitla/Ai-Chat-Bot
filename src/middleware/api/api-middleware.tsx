@@ -1,31 +1,36 @@
 import jwt from 'jsonwebtoken';
 import api from '@/lib/api';
 
+type TisAuthenticated = {
+    userId: string
+    isValidated: boolean
+}
 
-export default async function isAuthenticated(token: string | undefined): Promise<boolean> {
+export default async function isAuthenticated(token: string | undefined): Promise<TisAuthenticated> {
+    let isValidated = false
     if (!token) {
         console.error('No token provided');
-        return false;
+        return { userId: '', isValidated: false };
     }
 
     try {
         // Verify the token
-        const decoded: any = jwt.decode(token); // Ensure JWT_SECRET_KEY is correctly defined
+        const decoded: any = jwt.decode(token);
         if (decoded && typeof decoded === 'object' && decoded.email) {
             try {
                 const response = await api.post('/auth', { email: decoded.email });
-                return !!response.data.user
+                return { userId: response.data.user._id, isValidated: !!response.data.user };
             } catch (apiError: any) {
                 // Handle errors from the API call
                 console.error(`Error fetching user from API: ${apiError.response?.status} - ${apiError.response?.data?.message || apiError.message}`);
-                return false;
+                return { userId: '', isValidated: false };
             }
         } else {
             console.error('Invalid token structure');
-            return false;
+            return { userId: '', isValidated: false };
         }
     } catch (error: any) {
         console.error('Error verifying token:', error.message);
-        return false;
+        return { userId: '', isValidated: false };
     }
 }

@@ -12,10 +12,12 @@ import { FormEvent } from "react";
 import ReusableFormRow from "../ui/reusable-formrow";
 import ReusableInput from "../ui/reusable-input";
 import api from "@/lib/api";
+import useAuthStore from "@/store/authStore";
 
 export default function Login() {
 
     const router = useRouter()
+    const { setUser } = useAuthStore()
     const {
         register,
         handleSubmit,
@@ -26,11 +28,11 @@ export default function Login() {
 
     const onSubmit = handleSubmit(async (data: IloginForm) => {
         const newData: any = { ...data }
-        console.log(newData, "newData")
         await api.post("/login", newData).then((res) => {
             toast({
                 title: "Login Successfully"
             })
+            setUser(res.data.user)
             router.push("/")
         }).catch((err: AxiosError) => {
             if (axios.isAxiosError(err) && err.response?.data) {

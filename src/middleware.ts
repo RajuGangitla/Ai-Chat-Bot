@@ -2,18 +2,26 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import isAuthenticated from './middleware/api/api-middleware';
 
+export const config = {
+    matcher: ['/api/auth', '/'],
+}
+
 export async function middleware(request: NextRequest) {
     const authToken = request.cookies.get('authToken')?.value;
 
     if (!authToken) {
-        return NextResponse.json({ error: 'Unauthorized', message: 'Missing authentication token' }, { status: 401 });
+        const url = new URL('/login', request.nextUrl.origin); // Create an absolute URL
+        return NextResponse.redirect(url);
     }
 
-    const authenticated = await isAuthenticated(authToken);
+    const { isValidated, userId } = await isAuthenticated(authToken);
 
-    if (authenticated) {
-        return NextResponse.next();
+    if (isValidated) {
+        const response = NextResponse.next();
+        response.headers.set('x-user-id', userId);
+        return response;
     } else {
-        return NextResponse.json({ error: 'Unauthorized', message: 'Invalid authentication token' }, { status: 401 });
+        const url = new URL('/login', request.nextUrl.origin); // Create an absolute URL
+        return NextResponse.redirect(url);
     }
 }

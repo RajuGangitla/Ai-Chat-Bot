@@ -44,15 +44,23 @@ export const POST = async (req: Request) => {
                     path: '/',
                 });
 
-                return new NextResponse(JSON.stringify({
-                    message: "User authenticated successfully",
-                    token: token,
-                }), {
+
+                return NextResponse.json({ message: "User created successfully", user: findUser }, {
                     status: 200,
                     headers: {
                         'Set-Cookie': serializedCookie,
                     }
                 });
+
+                // return new NextResponse(JSON.stringify({
+                //     message: "User authenticated successfully",
+                //     token: token,
+                // }), {
+                //     status: 200,
+                //     headers: {
+                //         'Set-Cookie': serializedCookie,
+                //     }
+                // });
             } else {
                 return NextResponse.json({ message: "Password is incorrect", status: 500 })
             }

@@ -5,13 +5,14 @@ import ChatInput from "./chat-input";
 import { useState } from "react";
 import { Bot, CircleUserRound } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import AuthGuard from "@/middleware/client/auth-guard";
 
 export interface IMessage {
     role: "user" | "system";
     content: string;
 }
 
-export default function ChatMessages() {
+const ChatMessages = () => {
     const [messages, setMessages] = useState<IMessage[]>([]);
 
     return (
@@ -54,3 +55,7 @@ export default function ChatMessages() {
         </>
     );
 }
+
+
+export default AuthGuard(ChatMessages)
+// export default ChatMessages
