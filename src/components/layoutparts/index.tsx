@@ -10,6 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <>
             {" "}
+
             <Toaster />
             {pathname === "/login" || pathname === "/signup" ? (
                 <>{children}</>

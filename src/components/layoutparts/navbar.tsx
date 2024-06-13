@@ -3,12 +3,49 @@
 import { Button } from "../ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar"
+import { useMutation } from "@tanstack/react-query"
+import api from "@/lib/api"
+import { useRouter } from "next/navigation"
 import useAuthStore from "@/store/authStore"
+import { toast } from "../ui/use-toast"
+import { ErrorResponse } from "@/types/signup"
+import axios, { AxiosError } from "axios"
 
 
 export default function NavBar() {
 
-    const { user } = useAuthStore()
+    const { user, setUser } = useAuthStore()
+    const router = useRouter()
+    async function logoutApi() {
+        const response = await api.post('/logout')
+        return response.data
+    }
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: logoutApi,
+        onSuccess: (res) => {
+            router.push("/login")
+            setUser(null)
+            toast({
+                title: "Logout Successfully"
+            })
+        },
+        onError: (error: AxiosError) => {
+            if (axios.isAxiosError(error) && error.response?.data) {
+                const errorResponse = error.response.data as ErrorResponse; // Type assertion
+                toast({
+                    title: errorResponse.message,
+                });
+                console.log(errorResponse.message, "error");
+            }
+        },
+    })
+
+    const handleClick = () => {
+        if (!isPending) {
+            mutate()
+        }
+    }
 
     return (
         <>
@@ -37,8 +74,8 @@ export default function NavBar() {
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">
-                            Log out
+                        <DropdownMenuItem className="cursor-pointer" onClick={handleClick}>
+                            {isPending ? 'Logging out...' : 'Logout'}
                             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

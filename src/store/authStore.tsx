@@ -10,7 +10,7 @@ type User = {
 
 type AuthStore = {
     user: User | null;
-    setUser: (data: User) => void;
+    setUser: (data: User | null) => void;
 };
 
 const useAuthStore = create<AuthStore>()(

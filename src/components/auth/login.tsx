@@ -4,45 +4,58 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { ErrorResponse, IloginForm } from "@/types/signup";
+import { ErrorResponse, ILoginApiResponse, IloginForm } from "@/types/signup";
 import axios, { AxiosError } from "axios";
 import { toast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
 import { FormEvent } from "react";
 import ReusableFormRow from "../ui/reusable-formrow";
 import ReusableInput from "../ui/reusable-input";
-import api from "@/lib/api";
 import useAuthStore from "@/store/authStore";
+import { useMutation } from "@tanstack/react-query";
+import { Loader } from "lucide-react";
+import api from "@/lib/api";
 
 export default function Login() {
 
     const router = useRouter()
     const { setUser } = useAuthStore()
     const {
-        register,
         handleSubmit,
         control,
         formState: { errors },
     } = useForm<IloginForm>();
 
+    async function postLoginData(data: IloginForm): Promise<ILoginApiResponse> {
+        const response = await api.post("/login", data);
+        return response.data;
+    }
 
-    const onSubmit = handleSubmit(async (data: IloginForm) => {
-        const newData: any = { ...data }
-        await api.post("/login", newData).then((res) => {
+    const { mutate, isPending, } = useMutation({
+        mutationFn: postLoginData,
+        onSuccess: (data: any) => {
             toast({
                 title: "Login Successfully"
-            })
-            setUser(res.data.user)
-            router.push("/")
-        }).catch((err: AxiosError) => {
-            if (axios.isAxiosError(err) && err.response?.data) {
-                const errorResponse = err.response.data as ErrorResponse; // Type assertion
+            });
+            console.log(data, "data")
+            setUser(data.user);
+            router.push("/");
+        },
+        onError: (error: AxiosError) => {
+            if (axios.isAxiosError(error) && error.response?.data) {
+                const errorResponse = error.response.data as ErrorResponse; // Type assertion
                 toast({
                     title: errorResponse.message,
                 });
                 console.log(errorResponse.message, "error");
             }
-        })
+        },
+    });
+
+
+    const onSubmit = handleSubmit(async (data: IloginForm) => {
+        const newData: any = { ...data }
+        mutate(newData);
     })
 
     return (
@@ -92,8 +105,10 @@ export default function Login() {
                                     />
                                 </ReusableFormRow>
                             </div>
-                            <Button type="submit" className="w-full">
-                                Login
+                            <Button disabled={isPending} type="submit" className="w-full">
+                                {
+                                    isPending ? <Loader className="mr-2 animate-spin h-4 w-4" /> : "Login"
+                                }
                             </Button>
                         </form>
 

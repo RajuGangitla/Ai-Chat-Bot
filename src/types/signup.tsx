@@ -40,3 +40,16 @@ export interface IloginForm {
     email: string;
     password: string;
 }
+
+
+export interface IUser {
+    email: string
+    firstName: string
+    lastName: string
+
+}
+
+export interface ILoginApiResponse {
+    message: string
+    user: IUser
+}

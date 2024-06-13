@@ -22,6 +22,7 @@ export const POST = async (req: Request) => {
             return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
         }
 
+
         const findUser = await Users.findOne({ email: body.email })
 
         if (findUser) {
@@ -31,7 +32,7 @@ export const POST = async (req: Request) => {
                     userId: findUser._id.toString(),
                     email: findUser.email,
                 };
-
+                const user = await Users.findOne({ email: body.email }).select('-password')
                 // Create JWT
                 const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
 
@@ -40,12 +41,12 @@ export const POST = async (req: Request) => {
                     httpOnly: true,
                     secure: false,
                     sameSite: 'strict',
-                    maxAge: 60 * 60, // 1 hour
+                    maxAge: 5 * 60 * 60, // 1 hour
                     path: '/',
                 });
 
 
-                return NextResponse.json({ message: "User created successfully", user: findUser }, {
+                return NextResponse.json({ message: "User created successfully", user: user }, {
                     status: 200,
                     headers: {
                         'Set-Cookie': serializedCookie,
