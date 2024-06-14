@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "../ui/button";
-import { useSession, signIn, signOut } from "next-auth/react";
 import { FormEvent } from "react";
 import Link from "next/link";
 import {
@@ -20,6 +19,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError, AxiosResponse } from "axios"
 import { toast } from "../ui/use-toast";
 import api from "@/lib/api";
+
+
 
 export default function SignUp() {
 

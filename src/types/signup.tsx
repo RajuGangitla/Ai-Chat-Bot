@@ -41,12 +41,23 @@ export interface IloginForm {
     password: string;
 }
 
+export const LoginSchema: ZodType<IloginForm> = z.object({
+    email: z.string({
+        required_error: "email is required",
+    }).email(),
+    password: z
+        .string({
+            required_error: "password is required"
+        })
+        .min(8, { message: "Password is too short" })
+        .max(20, { message: "Password is too long" }),
+})
+
 
 export interface IUser {
     email: string
     firstName: string
     lastName: string
-
 }
 
 export interface ILoginApiResponse {
