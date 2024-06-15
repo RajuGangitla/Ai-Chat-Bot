@@ -57,5 +57,5 @@ const ChatMessages = () => {
 }
 
 
-export default AuthGuard(ChatMessages)
-// export default ChatMessages
+// export default AuthGuard(ChatMessages)
+export default ChatMessages

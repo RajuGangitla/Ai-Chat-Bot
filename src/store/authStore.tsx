@@ -16,7 +16,12 @@ type AuthStore = {
 const useAuthStore = create<AuthStore>()(
     persist(
         (set, get) => ({
-            user: null,
+            user: {
+                email: "",
+                firstName: "",
+                lastName: "",
+                _id: ""
+            },
             setUser: (data) => set((state) => ({ user: data })),
         }),
         {

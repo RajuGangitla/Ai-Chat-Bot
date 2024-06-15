@@ -14,7 +14,7 @@ const AuthGuard = <P extends AuthGuardProps>(WrappedComponent: ComponentType<P>)
     const Wrapper: FC<P> = (props) => {
         const router = useRouter();
         const { user } = useAuthStore(); // Example check
-
+        console.log(user, "user")
         useEffect(() => {
             if (!user) {
                 router.push('/login');
