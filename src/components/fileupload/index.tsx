@@ -6,15 +6,41 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
 import FileUploader from "./uploader";
+import { Button } from "../ui/button";
+import api from "@/lib/api";
+import axios from "axios";
 
 export default function FileUpload() {
     const [open, setOpen] = useState<boolean>(false);
     const [files, setFiles] = useState<File[]>([]);
+
+
+    const handleSubmit = async () => {
+        const promises = files.map(async (file: File) => {
+            const formData = new FormData();
+            formData.append("file", file);
+            const response = await api.post("/uploadFiles", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            return response.data;
+        });
+
+        try {
+            const results = await Promise.all(promises);
+            console.log(results);
+        } catch (error) {
+            console.error("Error uploading files:", error);
+        }
+    }
+
 
     return (
         <>
@@ -23,7 +49,7 @@ export default function FileUpload() {
                     <Paperclip className="cursor-pointer" />
                 </DialogTrigger>
                 <DialogContent
-                    className="sm:max-w-xl"
+                    className="sm:max-w-xl h-[70vh]"
                     onInteractOutside={(e: any) => {
                         e.preventDefault();
                     }}
@@ -40,6 +66,9 @@ export default function FileUpload() {
                         maxFiles={3}
                         maxSize={1024 * 1024 * 2}
                     />
+                    <DialogFooter>
+                        <Button disabled={files.length === 0} onClick={handleSubmit} type="submit">Upload</Button>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </>
