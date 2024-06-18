@@ -14,7 +14,7 @@ import {
 import FileUploader from "./uploader";
 import { Button } from "../ui/button";
 import api from "@/lib/api";
-import axios from "axios";
+import { toast } from "../ui/use-toast";
 
 export default function FileUpload() {
     const [open, setOpen] = useState<boolean>(false);
@@ -35,11 +35,21 @@ export default function FileUpload() {
 
         try {
             const results = await Promise.all(promises);
+            setOpen(false);
+            setFiles([]);
+            toast({
+                title: "Files uploaded successfully",
+            });
             console.log(results);
         } catch (error) {
             console.error("Error uploading files:", error);
+            toast({
+                title: "Error uploading files",
+                variant: "destructive",
+            });
         }
     }
+
 
 
     return (

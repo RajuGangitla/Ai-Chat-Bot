@@ -1,58 +1,44 @@
-import { v2 as cloudinary } from "cloudinary";
 import { NextRequest, NextResponse } from "next/server";
+import Files from "@/models/files"
+import mongoose from "mongoose";
+import { TextLoader } from "langchain/document_loaders/fs/text";
 
-
-// Cloudinary config
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_SECRET,
-    secure: true,
-});
 
 export const POST = async (req: NextRequest) => {
 
     const data = await req.formData();
     const file = await data.get("file") as unknown as File;
-
-    console.log(file, "file")
-    const fileBuffer = await file.arrayBuffer();
-
-    var mime = file.type;
-    var encoding = 'base64';
-    var base64Data = Buffer.from(fileBuffer).toString('base64');
-    var fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
+    const userId = req.headers.get('x-user-id');
 
     try {
 
-        const uploadToCloudinary = () => {
-            return new Promise((resolve, reject) => {
-
-                var result = cloudinary.uploader.upload(fileUri, {
-                    resource_type: 'auto',
-                    invalidate: true
-                })
-                    .then((result) => {
-                        console.log(result);
-                        resolve(result);
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        reject(error);
-                    });
-            });
-        };
-
-        const result: any = await uploadToCloudinary();
-
-        let fileUrl = result.secure_url;
+        const addFile = await Files.create({
+            size: file.size,
+            type: file?.type,
+            name: file?.name,
+            userId: new mongoose.Types.ObjectId(userId as string),
+        })
 
         return NextResponse.json(
-            { success: true, fileUrl: fileUrl },
+            { success: true, addFile },
             { status: 200 }
         );
-    } catch (error) {
+    } catch (error: any) {
         console.log("server err", error);
-        return NextResponse.json({ err: "Internal Server Error" }, { status: 500 });
+        if (error instanceof mongoose.Error.ValidationError) {
+            return NextResponse.json({ error: 'Validation Error', details: error.errors }, { status: 422 });
+        }
+
+        if (error.code === 11000) { // Duplicate key error
+            return NextResponse.json({ error: 'Duplicate Key Error', details: error.keyValue }, { status: 409 });
+        }
+
+        return NextResponse.json({ error: "Internal Server Error", message: error.message }, { status: 500 });
     }
 };
+
+export function handleVectorisation(name: string) {
+    if (name.split(".").pop() === "txt") {
+
+    }
+}

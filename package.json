@@ -26,6 +26,7 @@
     "clsx": "^2.1.0",
     "cookie": "^0.6.0",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^0.2.5",
     "lucide-react": "^0.365.0",
     "mongoose": "^8.3.4",
     "next": "14.1.4",

@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import isAuthenticated from './middleware/api/api-middleware';
 
 export const config = {
-    matcher: ['/api/auth', '/'],
+    matcher: ['/api/auth', '/', '/api/uploadFiles'],
 }
 
 export async function middleware(request: NextRequest) {
