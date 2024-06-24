@@ -1,4 +1,4 @@
-import ChatMessages from "./messages";
+import ChatMessages from "./messages-list";
 
 
 export default function Chat() {

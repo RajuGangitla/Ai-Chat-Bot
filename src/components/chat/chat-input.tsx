@@ -4,29 +4,37 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "../ui/button";
 import { SetStateAction, useState } from "react";
 import React from "react";
-import { IMessage } from "./messages";
+import { IMessage } from "./messages-list";
 import FileUpload from "../fileupload";
 
 
 export interface IChatInputProps {
     messages: IMessage[];
     setMessages: React.Dispatch<SetStateAction<IMessage[]>>;
+    handleAgentCall: (messages: IMessage[]) => void
 }
 
 export default function ChatInput({
     messages,
     setMessages,
+    handleAgentCall,
 }: IChatInputProps) {
 
     const [input, setInput] = useState<string>('')
 
-    const handleSubmit = async () => {
-        setMessages((prevChat) => [
-            ...prevChat,
-            { role: 'user', content: input },
-        ]);
 
-        // Clear the user input field and end the loading state
+
+    const handleSubmit = async () => {
+        const newMessage: IMessage = { role: "user", content: input };
+        const updatedMessages = [...messages, newMessage];
+
+        // Update the messages state
+        setMessages(updatedMessages);
+
+        // Call handleAgentCall with the updated messages array
+        handleAgentCall(updatedMessages);
+
+        // Clear the user input field
         setInput('');
     }
 
