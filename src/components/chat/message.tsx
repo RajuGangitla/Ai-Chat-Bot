@@ -1,6 +1,7 @@
 import { IMessage } from "./messages-list"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import useAuthStore from "@/store/authStore"
+import MarkdownRenderer from "./markdown"
 
 
 
@@ -31,10 +32,17 @@ export default function Message({ index, msg }: IMessageProps) {
                     </>
                 ) : (
                     <>
-                        <div className="flex justify-end">
+                        <div className="flex justify-end gap-2">
                             <p className="bg-muted/50 text-sm px-4 py-2 rounded-lg  overflow-auto break-words max-w-xs">
-                                {msg.content}
+                                <MarkdownRenderer message={msg.content} />
                             </p>
+                            <div className="">
+                                <Avatar className="h-8 w-8">
+                                    {/* @ts-ignore */}
+                                    <AvatarImage src={"./chat-bot.jpg"} alt="profile" />
+                                    <AvatarFallback>{user?.firstName?.slice(0, 1)}</AvatarFallback>
+                                </Avatar>
+                            </div>
                         </div>
                     </>
                 )

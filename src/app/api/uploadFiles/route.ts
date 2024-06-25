@@ -7,6 +7,11 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { DocxLoader } from "@langchain/community/document_loaders/fs/docx";
 import { Pinecone } from "@pinecone-database/pinecone"
+import fs from 'fs';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
+import { streamToBuffer } from "@/utils";
+const pump = promisify(pipeline);
 
 export const POST = async (req: NextRequest) => {
 
@@ -15,11 +20,11 @@ export const POST = async (req: NextRequest) => {
     const userId = req.headers.get('x-user-id');
 
     try {
-
         const addFile = await Files.create({
             size: file.size,
             type: file?.type,
             name: file?.name,
+
             userId: new mongoose.Types.ObjectId(userId as string),
         })
 
@@ -52,31 +57,37 @@ export const POST = async (req: NextRequest) => {
     }
 };
 
+
 export async function handleVectorisation(metadata: Record<string, any>, file: any) {
     try {
         const pinecone = new Pinecone({
             apiKey: process.env.PINECONE_API_KEY as string,
         })
 
-        const pineconeIndex = pinecone.Index("files")
         const embeddings = new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_TOKEN })
-        const blob = new Blob([file.buffer], { type: "application/octet-stream" })
-        let loader: any
-        if (file.name.split(".").pop() === "txt") {
-            loader = new TextLoader(blob)
+        const buffer = await streamToBuffer(file.stream());
+        const blob = new Blob([buffer], { type: "application/octet-stream" })
+
+        let loader: any;
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+
+        switch (fileExtension) {
+            case "txt":
+                loader = new TextLoader(blob);
+                break;
+            case "pdf":
+                loader = new PDFLoader(blob);
+                break;
+            case "docx":
+                loader = new DocxLoader(blob);
+                break;
+            case "doc":
+                loader = new DocxLoader(blob);
+                break;
+            default:
+                throw new Error(`Unsupported file extension: ${fileExtension}`);
         }
-        if (file.name.split(".").pop() === "pdf") {
-            loader = new PDFLoader(blob)
-        }
-        if (file.name.split(".").pop() === "docx") {
-            loader = new DocxLoader(blob)
-        }
-        if (file.name.split(".").pop() === "doc") {
-            loader = new DocxLoader(blob)
-        }
-        // if (file.originalname.split(".").pop() === "csv") {
-        //     loader = new CSVLoader(blob)
-        // }
+
 
         const docs: any = await loader.load()
 
@@ -98,14 +109,14 @@ export async function handleVectorisation(metadata: Record<string, any>, file: a
         const embeddingPromises = await Promise.all(output.map(async (chunk, index) => {
             const res = await embeddings.embedQuery(chunk?.pageContent)
             let data = {
-                id: `${metadata?.fileName}`,
+                id: `${metadata?.fileName}-${index}`,
                 metadata: { ...metadata, text: chunk?.pageContent },
                 values: res,
             }
             datatobeAdded.push(data)
         }
         ));
-
+        console.log(datatobeAdded.length, "output")
         // Upsert all chunks in one operation.
         // await pinecone.index(name).namespace(`${metadata?.fileName}-${metadata?.filePath}`).upsert(datatobeAdded);
         await pinecone.index("files").upsert(datatobeAdded);
@@ -114,4 +125,6 @@ export async function handleVectorisation(metadata: Record<string, any>, file: a
         console.log(error, "errro message")
         return false
     }
+
+
 }

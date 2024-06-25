@@ -2,10 +2,10 @@
 
 import { Card } from "@/components/ui/card";
 import ChatInput from "./chat-input";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Message from "./message";
-import api from "@/lib/api";
+
 
 export interface IMessage {
     role: "user" | "system";
@@ -16,23 +16,7 @@ const ChatMessages = () => {
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [streamMessage, setStreamMessage] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false)
-
-
-    async function* getIterableStream(
-        body: ReadableStream<Uint8Array>
-    ): AsyncIterable<string> {
-        const reader = body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) {
-                break;
-            }
-            const decodedChunk = decoder.decode(value, { stream: true });
-            yield decodedChunk;
-        }
-    }
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
 
     const generateStream = async (data: any) => {
         const response = await fetch(
@@ -45,9 +29,9 @@ const ChatMessages = () => {
                 body: JSON.stringify(data),
             }
         );
-        if (response.status !== 200) throw new Error(response.status.toString());
-        if (!response.body) throw new Error("Response body does not exist");
-        return getIterableStream(response.body);
+        // if (response.status !== 200) throw new Error(response.status.toString());
+        // if (!response.body) throw new Error("Response body does not exist");
+        return response.json();
     };
 
     const handleAgentCall = async (data: IMessage[]) => {
@@ -55,29 +39,33 @@ const ChatMessages = () => {
         let apiData = {
             messages: data
         }
-        const stream = await generateStream(apiData);
-        let fullMessage = ""
-        for (const chunk of stream) {
-            fullMessage += chunk;
-            setStreamMessage((prev) => prev + chunk);
-        }
+        const response = await generateStream(apiData);
         setIsLoading(false)
         let message = {
-            content: fullMessage,
+            content: response?.message,
             role: "system",
         };
         setMessages((prev: any) => {
-            return [message, ...prev];
+            return [...prev, message];
         });
         setStreamMessage("");
     }
+
+    useEffect(() => {
+        if (scrollAreaRef.current) {
+            scrollAreaRef.current.scrollTo({
+                top: scrollAreaRef.current.scrollHeight,
+                behavior: "smooth",
+            });
+        }
+    }, [messages, isLoading]);
 
 
     return (
         <>
             <div className="pb-[10px] pt-4 md:pt-10">
                 <Card className="mx-auto max-w-2xl h-[450px] px-4">
-                    <ScrollArea className="h-full rounded-md p-4">
+                    <ScrollArea className="h-full rounded-md p-4" ref={scrollAreaRef}>
                         <div className="flex flex-col flex-1 gap-4">
                             {messages?.map((msg, index) => {
                                 return (
@@ -87,6 +75,13 @@ const ChatMessages = () => {
                                 );
                             })}
                         </div>
+                        {
+                            isLoading && <div className="flex justify-end">
+                                <p className="bg-muted/50 text-sm px-4 py-2 rounded-lg  overflow-auto break-words max-w-xs">
+                                    Loading ...
+                                </p>
+                            </div>
+                        }
                     </ScrollArea>
                 </Card>
             </div>
@@ -97,5 +92,4 @@ const ChatMessages = () => {
 }
 
 
-// export default AuthGuard(ChatMessages)
 export default ChatMessages
