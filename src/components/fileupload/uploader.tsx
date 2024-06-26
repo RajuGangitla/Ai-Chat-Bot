@@ -16,6 +16,7 @@ interface IUploader {
     maxSize: number;
     multiple?: boolean;
     accept?: DropzoneProps["accept"];
+    progress: { [key: string]: number };
 }
 
 export default function FileUploader({
@@ -25,6 +26,7 @@ export default function FileUploader({
     maxSize,
     multiple,
     accept,
+    progress,
 }: IUploader) {
     const onDrop = React.useCallback(
         (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
@@ -139,7 +141,7 @@ export default function FileUploader({
                                     key={index}
                                     file={file}
                                     onRemove={() => onRemove(index)}
-                                // progress={progresses?.[file.name]}
+                                    progress={progress[file.name]}
                                 />
                             ))}
                         </div>

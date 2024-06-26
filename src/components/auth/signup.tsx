@@ -54,8 +54,8 @@ export default function SignUp() {
 
     return (
         <>
-            <div className="flex min-h-screen items-center justify-center">
-                <Card className="mx-auto max-w-sm">
+            <div className="flex min-h-screen items-center justify-center bg-muted/50">
+                <Card className="bg-black mx-auto max-w-sm border-2">
                     <CardHeader>
                         <CardTitle className="text-xl">Sign Up</CardTitle>
                         <CardDescription>

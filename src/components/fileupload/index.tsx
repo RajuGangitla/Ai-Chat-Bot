@@ -19,6 +19,7 @@ import { toast } from "../ui/use-toast";
 export default function FileUpload() {
     const [open, setOpen] = useState<boolean>(false);
     const [files, setFiles] = useState<File[]>([]);
+    const [progress, setProgress] = useState<{ [key: string]: number }>({});
 
 
     const handleSubmit = async () => {
@@ -28,6 +29,10 @@ export default function FileUpload() {
             const response = await api.post("/uploadFiles", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
+                },
+                onUploadProgress: (event) => {
+                    const percentCompleted = Math.round((event.loaded * 100) / event.total);
+                    setProgress((prev) => ({ ...prev, [file.name]: percentCompleted }));
                 },
             });
             return response.data;
@@ -75,6 +80,7 @@ export default function FileUpload() {
                         setFiles={setFiles}
                         maxFiles={3}
                         maxSize={1024 * 1024 * 2}
+                        progress={progress}
                     />
                     <DialogFooter>
                         <Button disabled={files.length === 0} onClick={handleSubmit} type="submit">Upload</Button>

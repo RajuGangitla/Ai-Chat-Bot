@@ -60,10 +60,11 @@ export default function Login() {
 
     return (
         <div className="w-full min-h-screen lg:grid lg:grid-cols-2 ">
-            <div className="flex items-center justify-center py-12">
-                <div className="mx-auto grid w-[350px] gap-6">
+            <div className="flex h-screen items-center justify-center py-12 bg-muted/50"
+            >
+                <div className="bg-black mx-auto grid w-[350px] gap-6 border-2 p-6 rounded-lg shadow-lg">
                     <div className="grid gap-2 text-center">
-                        <h1 className="text-3xl font-bold">Login</h1>
+                        <h1 className="text-3xl font-bold">Welcome Back!</h1>
                         <p className="text-balance text-muted-foreground">
                             Enter your email below to login to your account
                         </p>
@@ -126,12 +127,6 @@ export default function Login() {
                     alt="Image"
                     className="h-full w-full object-cover rounded-lg"
                 />
-                {/* <Image
-                    src="/login-3.png"
-                    alt="Image"
-                    width="1920"
-                    height="1080"
-                /> */}
             </div>
         </div>
     );

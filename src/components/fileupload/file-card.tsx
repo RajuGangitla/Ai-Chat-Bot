@@ -8,9 +8,10 @@ interface IFileCard {
     key: number;
     file: File;
     onRemove: () => void;
+    progress: number;
 }
 
-export default function FileCard({ file, onRemove }: IFileCard) {
+export default function FileCard({ file, onRemove, progress }: IFileCard) {
     const getFileIcon = (fileType: string) => {
         if (fileType.startsWith("image/")) {
             return <FaFileImage className="w-12 h-12 text-blue-500" />;
@@ -25,6 +26,7 @@ export default function FileCard({ file, onRemove }: IFileCard) {
         }
     };
 
+    console.log(progress)
     return (
         <div className="relative flex items-center space-x-4">
             <div className="flex flex-1 space-x-4">
@@ -51,6 +53,17 @@ export default function FileCard({ file, onRemove }: IFileCard) {
                     </div>
                 </div>
             </div>
+            {progress >= 0 && (
+                <div className="relative pt-1">
+                    <div className="overflow-hidden h-2 text-xs flex rounded bg-blue-200">
+                        <div
+                            style={{ width: `${progress}%` }}
+                            className="bg-blue-500 shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center"
+                        ></div>
+                    </div>
+                    <span>{progress}%</span>
+                </div>
+            )}
             <div className="flex items-center gap-2">
                 <Button
                     type="button"

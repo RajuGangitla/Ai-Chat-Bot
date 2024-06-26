@@ -49,15 +49,20 @@ export default function NavBar() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 flex items-center justify-between w-full h-16 px-4 border-b shrink-0">
+            <header className="sticky top-0 z-50 flex items-center justify-between w-full h-16 px-16 py-2 border-b shrink-0">
                 <div className="flex items-center space-x-2">
                     {/* Image */}
+                    <Avatar className="h-8 w-8">
+                        {/* @ts-ignore */}
+                        <AvatarImage src={"./chat-bot.jpg"} alt="profile" />
+                        <AvatarFallback>{user?.firstName?.slice(0, 1)}</AvatarFallback>
+                    </Avatar>
                     <p className="text-lg font-semibold ">AI Chat Bot</p>
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-10 w-10 border-2 border-gray-300">
                                 {/* @ts-ignore */}
                                 <AvatarImage src={user?.image} alt="profile" />
                                 <AvatarFallback>{user?.firstName?.slice(0, 1)}</AvatarFallback>
