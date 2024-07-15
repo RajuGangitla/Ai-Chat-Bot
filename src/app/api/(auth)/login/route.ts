@@ -27,6 +27,7 @@ export const POST = async (req: Request) => {
 
         if (findUser) {
             const isPasswordMatched = await bcrypt.compare(body.password, findUser.password);
+            console.log(isPasswordMatched, "isPasswordMatched")
             if (isPasswordMatched) {
                 const payload: JwtPayload = {
                     userId: findUser._id.toString(),
@@ -53,21 +54,12 @@ export const POST = async (req: Request) => {
                     }
                 });
 
-                // return new NextResponse(JSON.stringify({
-                //     message: "User authenticated successfully",
-                //     token: token,
-                // }), {
-                //     status: 200,
-                //     headers: {
-                //         'Set-Cookie': serializedCookie,
-                //     }
-                // });
             } else {
-                return NextResponse.json({ message: "Password is incorrect", status: 500 })
+                return NextResponse.json({ message: "Password is incorrect" }, { status: 401 });
             }
         }
         else {
-            return NextResponse.json({ message: "NO User found", status: 404 })
+            return NextResponse.json({ error: "NO User found", status: 404 })
         }
     } catch (error: any) {
         console.error("Error in creating user:", error);

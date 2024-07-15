@@ -25,17 +25,14 @@ export default function Message({ index, msg }: IMessageProps) {
                                     <AvatarFallback>{user?.firstName?.slice(0, 1)}</AvatarFallback>
                                 </Avatar>
                             </div>
-                            <div className="bg-muted/50 text-sm px-4 py-2 rounded-lg overflow-auto break-words max-w-xs">
+                            <div className="bg-muted/50 text-sm px-4 py-2 rounded-lg overflow-auto break-words ">
                                 {msg.content}
                             </div>
                         </div>
                     </>
                 ) : (
                     <>
-                        <div className="flex justify-end gap-2">
-                            <p className="bg-muted/50 text-sm px-4 py-2 rounded-lg  overflow-auto break-words max-w-xs">
-                                <MarkdownRenderer message={msg.content} />
-                            </p>
+                        <div className="flex gap-2">
                             <div className="">
                                 <Avatar className="h-8 w-8">
                                     {/* @ts-ignore */}
@@ -43,6 +40,10 @@ export default function Message({ index, msg }: IMessageProps) {
                                     <AvatarFallback>{user?.firstName?.slice(0, 1)}</AvatarFallback>
                                 </Avatar>
                             </div>
+                            <p className="bg-muted/50 text-sm px-4 py-2 rounded-lg overflow-auto break-words ">
+                                <MarkdownRenderer message={msg.content} />
+                            </p>
+
                         </div>
                     </>
                 )

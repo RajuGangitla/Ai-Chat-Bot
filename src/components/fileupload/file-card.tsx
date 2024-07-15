@@ -1,8 +1,9 @@
 import { formatBytes } from "@/lib/utils";
 import { Button } from "../ui/button";
 import Image from "next/image";
-import { X } from "lucide-react";
-import { FaFileImage, FaFilePdf, FaFileWord, FaFileExcel, FaFileAlt } from "react-icons/fa";
+import { Loader, X } from "lucide-react";
+import { getFileIcon } from "@/utils/get-fileIcon";
+
 
 interface IFileCard {
     key: number;
@@ -12,21 +13,7 @@ interface IFileCard {
 }
 
 export default function FileCard({ file, onRemove, progress }: IFileCard) {
-    const getFileIcon = (fileType: string) => {
-        if (fileType.startsWith("image/")) {
-            return <FaFileImage className="w-12 h-12 text-blue-500" />;
-        } else if (fileType === "application/pdf") {
-            return <FaFilePdf className="w-12 h-12 text-red-500" />;
-        } else if (fileType === "application/msword" || fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-            return <FaFileWord className="w-12 h-12 text-blue-700" />;
-        } else if (fileType === "application/vnd.ms-excel" || fileType === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-            return <FaFileExcel className="w-12 h-12 text-green-500" />;
-        } else {
-            return <FaFileAlt className="w-12 h-12 text-gray-500" />;
-        }
-    };
 
-    console.log(progress)
     return (
         <div className="relative flex items-center space-x-4">
             <div className="flex flex-1 space-x-4">
@@ -40,7 +27,7 @@ export default function FileCard({ file, onRemove, progress }: IFileCard) {
                         className="aspect-square shrink-0 rounded-md object-cover"
                     />
                 ) : (
-                    getFileIcon(file.type)
+                    getFileIcon(file.type, 12)
                 )}
                 <div className="flex w-full flex-col gap-2">
                     <div className="space-y-px">
@@ -62,6 +49,11 @@ export default function FileCard({ file, onRemove, progress }: IFileCard) {
                         ></div>
                     </div>
                     <span>{progress}%</span>
+                </div>
+            )}
+            {progress === 100 && (
+                <div className="flex items-center justify-center">
+                    <Loader className="w-5 h-5 animate-spin text-gray-500" />
                 </div>
             )}
             <div className="flex items-center gap-2">

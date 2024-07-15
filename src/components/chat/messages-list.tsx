@@ -5,6 +5,7 @@ import ChatInput from "./chat-input";
 import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Message from "./message";
+import { toast } from "../ui/use-toast";
 
 
 export interface IMessage {
@@ -29,19 +30,29 @@ const ChatMessages = () => {
                 body: JSON.stringify(data),
             }
         );
-        // if (response.status !== 200) throw new Error(response.status.toString());
-        // if (!response.body) throw new Error("Response body does not exist");
+
+        if (response.status !== 200) {
+            const errorResponse = await response.json();
+
+            // Display toast with error message
+            toast({
+                title: errorResponse?.error || "An error occurred, please try again."
+            });
+
+        }
+
+        // Return response in case of success
         return response.json();
     };
 
     const handleAgentCall = async (data: IMessage[]) => {
-        setIsLoading(true)
-        let apiData = {
-            messages: data
-        }
+        setIsLoading(true);
+        const apiData = {
+            messages: data.length > 5 ? data.slice(-5) : data
+        };
         const response = await generateStream(apiData);
-        setIsLoading(false)
-        let message = {
+        setIsLoading(false);
+        const message = {
             content: response?.message,
             role: "system",
         };
@@ -49,7 +60,8 @@ const ChatMessages = () => {
             return [...prev, message];
         });
         setStreamMessage("");
-    }
+    };
+
 
     useEffect(() => {
         if (scrollAreaRef.current) {
@@ -64,7 +76,7 @@ const ChatMessages = () => {
     return (
         <>
             <div className="pb-[10px] pt-4 md:pt-10">
-                <Card className="mx-auto max-w-2xl h-[450px] px-4">
+                <Card className="mx-auto max-w-[900px] h-[450px] px-4">
                     <ScrollArea className="h-full rounded-md p-4" ref={scrollAreaRef}>
                         <div className="flex flex-col flex-1 gap-4">
                             {messages?.map((msg, index) => {

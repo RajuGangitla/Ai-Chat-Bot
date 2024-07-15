@@ -41,7 +41,7 @@ export default function ChatInput({
 
     return (
         <>
-            <div className="pt-8 mx-auto max-w-2xl">
+            <div className="pt-8 mx-auto max-w-[900px]">
                 <div className="relative border-2 border-gray-400 rounded-lg">
                     <Textarea
                         tabIndex={0}

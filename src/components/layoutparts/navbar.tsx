@@ -10,6 +10,7 @@ import useAuthStore from "@/store/authStore"
 import { toast } from "../ui/use-toast"
 import { ErrorResponse } from "@/types/signup"
 import axios, { AxiosError } from "axios"
+import Link from "next/link"
 
 
 export default function NavBar() {
@@ -78,6 +79,12 @@ export default function NavBar() {
                                 </p>
                             </div>
                         </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <Link href={"/files"}>
+                            <DropdownMenuLabel className="font-normal">
+                                <p className="cursor-pointer text-sm font-medium leading-none">Files</p>
+                            </DropdownMenuLabel>
+                        </Link>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="cursor-pointer" onClick={handleClick}>
                             {isPending ? 'Logging out...' : 'Logout'}

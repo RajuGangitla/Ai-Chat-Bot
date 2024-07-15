@@ -128,3 +128,91 @@ export async function handleVectorisation(metadata: Record<string, any>, file: a
 
 
 }
+
+export const GET = async (req: NextRequest) => {
+
+    const userId = req.headers.get('x-user-id');
+
+    try {
+
+        const files = await Files.find({
+            userId: new mongoose.Types.ObjectId(userId as string),
+        })
+
+        return NextResponse.json(
+            { success: true, files: files },
+            { status: 200 }
+        );
+    } catch (error: any) {
+        return NextResponse.json({ error: "Internal Server Error", message: error.message }, { status: 500 });
+    }
+};
+
+
+export const DELETE = async (req: NextRequest) => {
+    try {
+        const url = new URL(req.url);
+        const fileId = url.pathname.split('/').pop();
+
+
+        if (!fileId) {
+            return NextResponse.json({ error: "File ID is required" }, { status: 400 });
+        }
+
+        const file = await Files.findOne({
+            _id: new mongoose.Types.ObjectId(fileId as string),
+        })
+
+
+        const result = await Files.deleteOne({
+            _id: new mongoose.Types.ObjectId(fileId as string),
+        })
+
+        let data = {
+            prefix: `${file?.name}`,
+        }
+
+        await deleteVectors(data)
+
+
+        return NextResponse.json(
+            { result: result },
+            { status: 200 }
+        );
+    } catch (error: any) {
+        return NextResponse.json({ error: "Internal Server Error", message: error.message }, { status: 500 });
+    }
+
+}
+
+async function deleteVectors(data: any) {
+    try {
+        const pinecone = new Pinecone({
+            apiKey: process.env.PINECONE_API_KEY as string,
+        })
+        const index = await pinecone.index("files")
+        let fetchMore = true;
+        let pageToken = undefined;
+
+        while (fetchMore) {
+            const results = await index.listPaginated({ prefix: data.prefix, limit: 100, paginationToken: pageToken });
+            console.log(results, "results")
+
+            if (results.vectors && results.vectors.length > 0) {
+                const vectorIds = results.vectors.map(v => v.id);
+
+                // Perform deletion of fetched vectors
+                await index.deleteMany(vectorIds);
+                console.log(`Deleted ${vectorIds.length} vectors.`);
+            } else {
+                fetchMore = false; // No more vectors to fetch
+            }
+
+            pageToken = results?.pagination?.next;
+            fetchMore = !!pageToken;
+        }
+    } catch (error: any) {
+        return NextResponse.json({ error: "Internal Server Error", message: error.message }, { status: 500 });
+    }
+}
+

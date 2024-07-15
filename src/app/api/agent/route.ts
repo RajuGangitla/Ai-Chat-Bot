@@ -11,36 +11,38 @@ export const runtime = 'edge'
 
 // Handles GET requests to /api
 export async function POST(req: Request) {
+    if (!process.env.OPENAI_TOKEN) {
+        return NextResponse.json({ error: "OpenAI API key is missing." }, { status: 500 });
+    }
 
-    const { messages } = await req.json()
+    try {
+        const { messages } = await req.json();
+        const lastMessage = messages[messages.length - 1];
 
-    const lastMessage = messages[messages?.length - 1]
+        const context = await queryPineConeVectorsRetriever(lastMessage.content);
+        const prompt = [{
+            role: 'system',
+            content: `You are a helpful assistant.
+                You will take into account any CONTEXT BLOCK
+                that is provided in a conversation.
+                START CONTEXT BLOCK
+                ${context.map((c: any) => c.metadata.text).join("\n")}
+                END OF CONTEXT BLOCK`,
+        }];
 
-    const context = await queryPineConeVectorsRetriever(lastMessage?.content)
-    const prompt = [{
-        role: 'system',
-        content: `You are a helpful assistant.
-            You will take into account any CONTEXT BLOCK
-            that is provided in a conversation.
-            START CONTEXT BLOCK
-            ${context.map((c: any) => c.metadata.text).join("\n")}
-            END OF CONTEXT BLOCK`,
-    }]
+        const newMessages = [...prompt, ...messages];
 
-    const newmessages = [...prompt, ...messages]
+        const response = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: newMessages || [],
+        });
 
-    const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        // stream: true,
-        messages: newmessages || [],
-    });
-    // // Convert the response into a friendly text-stream
-    // const stream = OpenAIStream(response);
+        return NextResponse.json({ message: response.choices[0].message.content });
 
-    // // Respond with the stream
-    // return new StreamingTextResponse(stream);
-    return NextResponse.json({ message: response?.choices[0]?.message?.content })
-
+    } catch (error: any) {
+        console.error("Error in POST /api:", error);
+        return NextResponse.json({ error: "Internal Server Error", message: error.message }, { status: 500 });
+    }
 }
 
 

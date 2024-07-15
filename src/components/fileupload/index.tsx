@@ -31,8 +31,10 @@ export default function FileUpload() {
                     "Content-Type": "multipart/form-data",
                 },
                 onUploadProgress: (event) => {
-                    const percentCompleted = Math.round((event.loaded * 100) / event.total);
-                    setProgress((prev) => ({ ...prev, [file.name]: percentCompleted }));
+                    if (event.total) {
+                        const percentCompleted = Math.round((event.loaded * 100) / event.total);
+                        setProgress((prev) => ({ ...prev, [file.name]: percentCompleted }));
+                    }
                 },
             });
             return response.data;

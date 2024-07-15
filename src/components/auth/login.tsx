@@ -38,7 +38,6 @@ export default function Login() {
             toast({
                 title: "Login Successfully",
             });
-            console.log(data, "data");
             setUser(data.user);
             router.push("/");
         },
@@ -59,7 +58,7 @@ export default function Login() {
     });
 
     return (
-        <div className="w-full min-h-screen lg:grid lg:grid-cols-2 ">
+        <>
             <div className="flex h-screen items-center justify-center py-12 bg-muted/50"
             >
                 <div className="bg-black mx-auto grid w-[350px] gap-6 border-2 p-6 rounded-lg shadow-lg">
@@ -121,13 +120,6 @@ export default function Login() {
                     </div>
                 </div>
             </div>
-            <div className="w-full h-screen hidden bg-muted lg:block">
-                <img
-                    src="/login-2.jpg"
-                    alt="Image"
-                    className="h-full w-full object-cover rounded-lg"
-                />
-            </div>
-        </div>
+        </>
     );
 }
