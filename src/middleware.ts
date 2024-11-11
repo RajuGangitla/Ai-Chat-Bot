@@ -14,7 +14,13 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(url);
     }
 
-    const { isValidated, userId } = await isAuthenticated(authToken);
+    let isValidated, userId;
+    try {
+        ({ isValidated, userId } = await isAuthenticated(authToken));
+    } catch (error) {
+        const url = new URL('/login', request.nextUrl.origin);
+        return NextResponse.redirect(url);
+    }
 
     if (isValidated) {
         const response = NextResponse.next();
