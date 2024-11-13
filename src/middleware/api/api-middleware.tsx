@@ -15,7 +15,7 @@ export default async function isAuthenticated(token: string | undefined): Promis
 
     try {
         // Verify the token
-        const decoded: any = jwt.decode(token);
+interface DecodedToken { email: string; } const decoded: DecodedToken | null = jwt.decode(token);
         if (decoded && typeof decoded === 'object' && decoded.email) {
             try {
                 const response = await api.post('/auth', { email: decoded.email });
