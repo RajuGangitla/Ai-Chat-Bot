@@ -53,7 +53,7 @@ const DropdownMenuSubContent = React.forwardRef<
     {...props}
   />
 ))
-DropdownMenuSubContent.displayName =
+DropdownMenuSubContent.displayName = 'DropdownMenuSubContent';
   DropdownMenuPrimitive.SubContent.displayName
 
 const DropdownMenuContent = React.forwardRef<
