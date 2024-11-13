@@ -19,7 +19,36 @@ const ChatMessages = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-    const generateStream = async (data: any) => {
+const generateStream = async (data: any) => {
+    try {
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/agent`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            }
+        );
+
+        if (response.status !== 200) {
+            const errorResponse = await response.json();
+
+            // Display toast with error message
+            toast({
+                title: errorResponse?.error || "An error occurred, please try again."
+            });
+        }
+
+        // Return response in case of success
+        return response.json();
+    } catch (error) {
+        toast({
+            title: "Network error occurred, please try again."
+        });
+    }
+};
         const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/agent`,
             {
