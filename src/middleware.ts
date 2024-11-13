@@ -21,6 +21,12 @@ export async function middleware(request: NextRequest) {
         const url = new URL('/login', request.nextUrl.origin);
         return NextResponse.redirect(url);
     }
+    try {
+        ({ isValidated, userId } = await isAuthenticated(authToken));
+    } catch (error) {
+        const url = new URL('/login', request.nextUrl.origin);
+        return NextResponse.redirect(url);
+    }
 
     if (isValidated) {
         const response = NextResponse.next();
