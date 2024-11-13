@@ -22,8 +22,6 @@ export default function ChatInput({
 
     const [input, setInput] = useState<string>('')
 
-
-
     const handleSubmit = async () => {
         const newMessage: IMessage = { role: "user", content: input };
         const updatedMessages = [...messages, newMessage];
