@@ -17,7 +17,15 @@ export default function NavBar() {
 
     const { user, setUser } = useAuthStore()
     const router = useRouter()
-    async function logoutApi() {
+async function logoutApi() {
+    try {
+        const response = await api.post('/logout')
+        return response.data
+    } catch (error) {
+        console.error('Logout API error:', error);
+        throw error;
+    }
+}
         const response = await api.post('/logout')
         return response.data
     }
