@@ -35,6 +35,9 @@ export default function ChatInput({
         setInput('');
     }
 
+
+    console.log("api imporved")
+
     return (
         <>
             <div className="pt-8 mx-auto max-w-[900px]">
